@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Référencement d'IA</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        #compteurs {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        #total-count {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        #category-counts {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .category-count {
+            background-color: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 20px;
+            color: #34495e;
+            max-width: 200px;
+            text-align: center;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-edit {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn-edit:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <h2>Liste d'IA</h2>
+
+<button class="btn btn-add" onclick="openForm()">Ajouter une IA</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Nom de l'IA</th>
+                <th onclick="sortTable(1)">Type d'IA</th>
+                <th onclick="sortTable(2)">Lien vers le site</th>
+                <th onclick="sortTable(3)">Version d'essai</th>
+                <th onclick="sortTable(4)">Version gratuite</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="ia-list">
+            <!-- Les entrées d'IA seront ajoutées ici dynamiquement -->
+        </tbody>
+    </table>
+
+    <div id="compteurs">
+        <div>Total IA: <span id="total-count">0</span></div>
+        <div id="category-counts"></div>
+    </div>
+
+    <script>
+         const iaData = [
+            { nom: "ChatGPT", type: "Traitement du langage naturel", lien: "https://chat.openai.com", essai: "Oui", gratuit: "Oui, version limitée en temps et usage." },
+            { nom: "Jasper", type: "Génération de contenu", lien: "https://www.jasper.ai", essai: "Oui", gratuit: "Non" },
+            { nom: "Grammarly", type: "Assistance à l'écriture", lien: "https://www.grammarly.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Writesonic", type: "Génération de contenu", lien: "https://writesonic.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Copy.ai", type: "Génération de contenu", lien: "https://www.copy.ai", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Notion AI", type: "Productivité et organisation", lien: "https://www.notion.so", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "DALL·E", type: "Génération d'images", lien: "https://openai.com/dall-e-2", essai: "Oui", gratuit: "Oui, crédits gratuits initiaux." },
+            { nom: "Canva", type: "Conception graphique", lien: "https://www.canva.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "DeepArt", type: "Génération d'images artistiques", lien: "https://deepart.io", essai: "Oui", gratuit: "Non" },
+            { nom: "NightCafe", type: "Génération d'images artistiques", lien: "https://nightcafe.studio", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Artbreeder", type: "Génération d'images", lien: "https://www.artbreeder.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Synthesia", type: "Génération de vidéos", lien: "https://www.synthesia.io", essai: "Oui", gratuit: "Non" },
+            { nom: "Pictory", type: "Génération de vidéos", lien: "https://pictory.ai", essai: "Oui", gratuit: "Non" },
+            { nom: "Lumen5", type: "Création de vidéos", lien: "https://www.lumen5.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Descript", type: "Édition audio/vidéo", lien: "https://www.descript.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Veed", type: "Édition vidéo", lien: "https://www.veed.io", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Otter.ai", type: "Transcription audio", lien: "https://otter.ai", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Rev.com", type: "Transcription et sous-titrage", lien: "https://www.rev.com", essai: "Non", gratuit: "Non" },
+            { nom: "Sonix", type: "Transcription audio", lien: "https://sonix.ai", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Trint", type: "Transcription audio", lien: "https://trint.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Fotor", type: "Édition photo", lien: "https://www.fotor.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Perplexity", type: "Moteur de recherche IA", lien: "https://www.perplexity.ai", essai: "Oui", gratuit: "Oui, version gratuite disponible." },
+            { nom: "VentureKit", type: "Planification d'affaires", lien: "https://venturekit.ai", essai: "Oui", gratuit: "Non" },
+            { nom: "Poe", type: "Plateforme de chatbots IA", lien: "https://poe.com", essai: "Oui", gratuit: "Oui, version gratuite disponible." },
+            { nom: "Websim", type: "Simulation et éducation", lien: "https://websim.ai", essai: "Oui", gratuit: "Non" },
+            { nom: "Suno", type: "Composition musicale", lien: "https://suno.ai", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "CopySmith", type: "Génération de contenu", lien: "https://copysmith.ai", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Runway", type: "Création vidéo et VFX", lien: "https://runwayml.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Deep Dream Generator", type: "Génération d'images artistiques", lien: "https://deepdreamgenerator.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Jukedeck", type: "Composition musicale", lien: "https://www.jukedeck.com", essai: "Non", gratuit: "Non" },
+            { nom: "AI Dungeon", type: "Jeux narratifs", lien: "https://play.aidungeon.io", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Simplified", type: "Création de contenu multimédia", lien: "https://simplified.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Looka", type: "Création de logos", lien: "https://looka.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Whisper (OpenAI)", type: "Reconnaissance vocale", lien: "https://openai.com/research/whisper", essai: "Non", gratuit: "Oui, open source." },
+            { nom: "Summarize (SumNotes)", type: "Résumé de texte", lien: "https://www.sumnotes.net", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Mistral Chat", type: "Traitement du langage naturel", lien: "https://chat.mistral.ai", essai: "Non", gratuit: "Oui, version limitée." },
+            { nom: "You.com", type: "Moteur de recherche IA", lien: "https://you.com", essai: "Non", gratuit: "Oui" },
+            { nom: "Wix ADI", type: "Création de sites web", lien: "https://www.wix.com/adi", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Bookmark AiDA", type: "Création de sites web", lien: "https://www.bookmark.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "The Grid", type: "Création de sites web", lien: "https://thegrid.io", essai: "Non", gratuit: "Non" },
+            { nom: "Jimdo Dolphin", type: "Création de sites web", lien: "https://www.jimdo.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Framer AI", type: "Prototypage et design", lien: "https://www.framer.com/ai", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Dialogflow", type: "Développement de chatbots", lien: "https://cloud.google.com/dialogflow", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Chatbot.com", type: "Développement de chatbots", lien: "https://www.chatbot.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "ManyChat", type: "Automatisation de messagerie", lien: "https://manychat.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Botpress", type: "Développement de chatbots", lien: "https://botpress.com", essai: "Oui", gratuit: "Oui, open source." },
+            { nom: "Drift", type: "Chatbots et engagement client", lien: "https://www.drift.com", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Microsoft Excel avec Power Query", type: "Analyse de données", lien: "https://www.microsoft.com/en-us/microsoft-365/excel", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "SheetAI", type: "Automatisation de feuilles de calcul", lien: "https://www.sheetai.app", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "DataRobot", type: "Apprentissage automatique", lien: "https://www.datarobot.com", essai: "Oui", gratuit: "Non" },
+            { nom: "PandasAI", type: "Analyse de données", lien: "https://pandas.ai", essai: "Non", gratuit: "Oui, open source." },
+            { nom: "Zoho Analytics", type: "Business Intelligence", lien: "https://www.zoho.com/analytics", essai: "Oui", gratuit: "Oui, version limitée." },
+            { nom: "Ideogram", type: "Génération d'images", lien: "https://ideogram.ai", essai: "Non", gratuit: "Oui, version limitée." },
+            { nom: "AITubo", type: "Génération d'images", lien: "https://aitubo.ai", essai: "Non", gratuit: "Oui, version limitée." }
+        ];
+
+        function updateCounts() {
+            const totalCount = iaData.length;
+            document.getElementById('total-count').textContent = totalCount;
+
+            const typeCounts = {};
+            iaData.forEach(ia => {
+                typeCounts[ia.type] = (typeCounts[ia.type] || 0) + 1;
+            });
+
+            const categoryCountsElement = document.getElementById('category-counts');
+            categoryCountsElement.innerHTML = '';
+            for (const [type, count] of Object.entries(typeCounts)) {
+                const countElement = document.createElement('span');
+                countElement.className = 'category-count';
+                countElement.textContent = `${type}: ${count}`;
+                categoryCountsElement.appendChild(countElement);
+            }
+        }
+
+        function populateTable() {
+            const tableBody = document.getElementById('ia-list');
+            tableBody.innerHTML = '';
+            iaData.forEach(ia => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${ia.nom}</td>
+                    <td>${ia.type}</td>
+                    <td><a href="${ia.lien}" target="_blank">${ia.lien}</a></td>
+                    <td>${ia.essai}</td>
+                    <td>${ia.gratuit}</td>
+                    <td><button class="btn btn-edit" onclick="editIA('${ia.nom}')">Modifier</button></td>
+                `;
+            });
+        }
+
+        function sortTable(n) {
+            const table = document.querySelector("table tbody");
+            const rows = Array.from(table.rows);
+
+            let ascending = table.getAttribute("data-sort-dir") === "asc";
+            table.setAttribute("data-sort-dir", ascending ? "desc" : "asc");
+
+            rows.sort((a, b) => {
+                const cellA = a.cells[n].innerText.toLowerCase();
+                const cellB = b.cells[n].innerText.toLowerCase();
+                if (cellA < cellB) return ascending ? -1 : 1;
+                if (cellA > cellB) return ascending ? 1 : -1;
+                return 0;
+            });
+
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        function editIA(nomIA) {
+            console.log(`Édition de l'IA : ${nomIA}`);
+        }
+
+        // Initialisation
+        updateCounts();
+        populateTable();
+function openForm() {
+    document.getElementById('form-popup').style.display = 'block';
+}
+
+function closeForm() {
+    document.getElementById('form-popup').style.display = 'none';
+}
+
+function addIA() {
+    const nom = document.getElementById('nom').value;
+    const type = document.getElementById('type').value;
+    const lien = document.getElementById('lien').value;
+    const essai = document.getElementById('essai').value;
+    const gratuit = document.getElementById('gratuit').value;
+
+    const newIA = { nom, type, lien, essai, gratuit };
+    iaData.push(newIA);
+
+    populateTable();
+    updateCounts();
+    closeForm();
+}
+
+    </script>
+<div id="form-popup" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    <h3>Ajouter une IA</h3>
+    <label for="nom">Nom de l'IA:</label>
+    <input type="text" id="nom" required><br><br>
+    <label for="type">Type d'IA:</label>
+    <input type="text" id="type" required><br><br>
+    <label for="lien">Lien vers le site:</label>
+    <input type="text" id="lien" required><br><br>
+    <label for="essai">Version d'essai:</label>
+    <select id="essai">
+        <option value="Oui">Oui</option>
+        <option value="Non">Non</option>
+    </select><br><br>
+    <label for="gratuit">Version gratuite:</label>
+    <input type="text" id="gratuit" required><br><br>
+    <button class="btn btn-add" onclick="addIA()">Ajouter</button>
+    <button class="btn btn-edit" onclick="closeForm()">Annuler</button>
+</div>
+
+</body>
+</html>
